@@ -1,4 +1,5 @@
 import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb'
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
@@ -6,9 +7,14 @@ import * as lambda from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 
+interface MyCdkStackProps extends cdk.StackProps {
+  stackName: 'blue' | 'green'
+  deploymentEnvironment: 'blue' | 'green';
+}
+
 //begin stack definition
-export class MyFirstCdkStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+export class FirstCdkAppStack extends Stack {
+  constructor(scope: cdk.App, id: string, props: MyCdkStackProps) {
     super(scope, id, props);
 
     //define dynamodb table

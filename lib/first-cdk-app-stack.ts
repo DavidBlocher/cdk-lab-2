@@ -24,8 +24,16 @@ export class FirstCdkAppStack extends Stack {
       }
     )
 
-    //define lambda function and regeference function file
+    //define lambda function and refeference function file
     const lambda_backend = new NodejsFunction(this, "function", {
+      tracing: lambda.Tracing.ACTIVE,
+      environment: {
+        DYNAMODB: dynamodb_table.tableName
+      },
+    })
+    
+    //define lambda function to add item
+    const add_item_lambda_backend = new NodejsFunction(this, "add-item", {
       tracing: lambda.Tracing.ACTIVE,
       environment: {
         DYNAMODB: dynamodb_table.tableName
@@ -34,6 +42,9 @@ export class FirstCdkAppStack extends Stack {
 
     //grant lambda function read access to dynamodb table
     dynamodb_table.grantReadData(lambda_backend.role!)
+    
+    //grant lambda function write access to dynamodb table
+    dynamodb_table.grantWriteData(add_item_lambda_backend.role!)
 
     //define apigateway
     const api = new apigateway.RestApi(this, "RestAPI", {
@@ -45,7 +56,9 @@ export class FirstCdkAppStack extends Stack {
 
     //define endpoint and associate it with lambda backend
     const endpoint = api.root.addResource("scan")
+    const addItemEndpoint = api.root.addResource("add")
     const endpointMethod = endpoint.addMethod("GET", new apigateway.LambdaIntegration(lambda_backend))
+    const addItemEndpointMethod = endpoint.addMethod("PUT", new apigateway.LambdaIntegration(add_item_lambda_backend))
 
   }
 }

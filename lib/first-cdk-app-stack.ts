@@ -1,4 +1,4 @@
-import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { RemovalPolicy, Stack, StackProps, App } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb'
@@ -7,14 +7,14 @@ import * as lambda from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 
-interface MyCdkStackProps extends cdk.StackProps {
+interface MyCdkStackProps extends StackProps {
   stackName: 'blue' | 'green'
   deploymentEnvironment: 'blue' | 'green';
 }
 
 //begin stack definition
 export class FirstCdkAppStack extends Stack {
-  constructor(scope: cdk.App, id: string, props: MyCdkStackProps) {
+  constructor(scope: App, id: string, props: MyCdkStackProps) {
     super(scope, id, props);
 
     //define dynamodb table
@@ -58,7 +58,7 @@ export class FirstCdkAppStack extends Stack {
     const endpoint = api.root.addResource("scan")
     const addItemEndpoint = api.root.addResource("add")
     const endpointMethod = endpoint.addMethod("GET", new apigateway.LambdaIntegration(lambda_backend))
-    const addItemEndpointMethod = endpoint.addMethod("PUT", new apigateway.LambdaIntegration(add_item_lambda_backend))
+    const addItemEndpointMethod = endpointMethod.addMethod("PUT", new apigateway.LambdaIntegration(add_item_lambda_backend))
 
   }
 }
